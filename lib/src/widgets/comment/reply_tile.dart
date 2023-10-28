@@ -21,11 +21,20 @@ class LMReplyTile extends StatefulWidget {
     this.actionsPadding,
     required this.onMenuTap,
     required this.onTagTap,
+    this.backgroundColor,
+    this.borderRadius,
+    this.margin,
+    this.width,
+    this.menu,
+    this.textStyle,
+    this.linkStyle,
   });
 
   final User user;
   final CommentReply comment;
 
+  final TextStyle? textStyle;
+  final TextStyle? linkStyle;
   final LMProfilePicture? profilePicture;
   final LMTextView? titleText;
   final LMTextView? subtitleText;
@@ -33,6 +42,11 @@ class LMReplyTile extends StatefulWidget {
   final EdgeInsets? actionsPadding;
   final Function(int) onMenuTap;
   final Function(String) onTagTap;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? margin;
+  final double? width;
+  final Widget? menu;
 
   @override
   State<LMReplyTile> createState() => _LMReplyTileState();
@@ -41,12 +55,22 @@ class LMReplyTile extends StatefulWidget {
 class _LMReplyTileState extends State<LMReplyTile> {
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Container(
-      decoration: const BoxDecoration(color: kWhiteColor),
+      decoration: BoxDecoration(
+        color: widget.backgroundColor ?? kWhiteColor,
+        borderRadius: widget.borderRadius,
+      ),
+      width: widget.width,
+      margin: widget.margin,
       padding: const EdgeInsets.symmetric(
-          horizontal: kPaddingLarge, vertical: kPaddingSmall),
+        horizontal: kPaddingLarge,
+        vertical: kPaddingSmall,
+      ),
+
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -58,20 +82,23 @@ class _LMReplyTileState extends State<LMReplyTile> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    widget.titleText ??
-                        LMTextView(
-                          text: widget.user.name,
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                    SizedBox(
+                      width: widget.width != null ? widget.width! * 0.6 : null,
+                      child: widget.titleText ??
+                          LMTextView(
+                            text: widget.user.name,
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
+                    ),
                     widget.subtitleText != null
                         ? kVerticalPaddingSmall
                         : const SizedBox(),
                     widget.subtitleText ?? const SizedBox(),
                     Container(
-                      width: 240,
+                      width: widget.width == null ? 240 : widget.width! * 0.6,
                       padding: const EdgeInsets.only(top: 12, bottom: 6),
                       child: ExpandableText(
                         widget.comment.text,
@@ -79,22 +106,30 @@ class _LMReplyTileState extends State<LMReplyTile> {
                         expandText: "see more",
                         animation: true,
                         maxLines: 4,
-                        linkStyle: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: kLinkColor),
+                        hashtagStyle: widget.linkStyle ??
+                            Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: theme.colorScheme.primary),
+                        linkStyle: widget.linkStyle ??
+                            Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(color: theme.colorScheme.primary),
                         textAlign: TextAlign.left,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: widget.textStyle ??
+                            Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
                   ],
                 ),
                 const Spacer(),
-                LMPostMenu(
-                  isFeed: false,
-                  menuItems: widget.comment.menuItems,
-                  onSelected: widget.onMenuTap,
-                ),
+                widget.menu ??
+                    LMPostMenu(
+                      isFeed: false,
+                      menuItems: widget.comment.menuItems,
+                      onSelected: widget.onMenuTap,
+                    ),
               ],
             ),
           ),

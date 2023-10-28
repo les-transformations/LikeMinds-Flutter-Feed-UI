@@ -22,6 +22,10 @@ class LMDocument extends StatefulWidget {
     this.subtitle,
     this.documentIcon,
     this.onRemove,
+    this.removeIcon,
+    this.showBorder = true,
+    this.backgroundColor,
+    this.textColor,
   }) : assert(documentFile != null || documentUrl != null);
 
   final Function()? onTap;
@@ -36,11 +40,15 @@ class LMDocument extends StatefulWidget {
   final double? borderRadius;
   final double? borderSize;
   final Color? borderColor;
+  final Color? textColor;
 
   final LMTextView? title;
   final LMTextView? subtitle;
-  final LMIcon? documentIcon;
+  final Widget? documentIcon;
+  final LMIcon? removeIcon;
   final Function? onRemove;
+  final bool showBorder;
+  final Color? backgroundColor;
 
   @override
   State<LMDocument> createState() => _LMDocumentState();
@@ -89,10 +97,13 @@ class _LMDocumentState extends State<LMDocument> {
                 ),
                 height: widget.height ?? 78,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: widget.borderColor ?? kGreyWebBGColor,
-                    width: widget.borderSize ?? 1,
-                  ),
+                  color: widget.backgroundColor,
+                  border: widget.showBorder
+                      ? Border.all(
+                          color: widget.borderColor ?? kGreyWebBGColor,
+                          width: widget.borderSize ?? 1,
+                        )
+                      : null,
                   borderRadius: BorderRadius.circular(
                     widget.borderRadius ?? kBorderRadiusMedium,
                   ),
@@ -108,7 +119,7 @@ class _LMDocumentState extends State<LMDocument> {
                           const LMIcon(
                             type: LMIconType.icon,
                             icon: Icons.picture_as_pdf,
-                            size: 30,
+                            size: 24,
                             color: Colors.red,
                           ),
                     ),
@@ -117,47 +128,54 @@ class _LMDocumentState extends State<LMDocument> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          LMTextView(
-                            text: _fileName ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textStyle: const TextStyle(
-                              fontSize: kFontMedium,
-                              color: kGrey2Color,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          widget.title ??
+                              LMTextView(
+                                text: _fileName ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: widget.textColor ?? kGrey2Color,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                           kVerticalPaddingSmall,
-                          Row(
-                            children: [
-                              kHorizontalPaddingXSmall,
-                              Text(
-                                _fileSize!.toUpperCase(),
-                                style: const TextStyle(
-                                    fontSize: kFontSmall, color: kGrey3Color),
-                              ),
-                              kHorizontalPaddingXSmall,
-                              const Text(
-                                '·',
-                                style: TextStyle(
-                                    fontSize: kFontSmall, color: kGrey3Color),
-                              ),
-                              kHorizontalPaddingXSmall,
-                              Text(
-                                _fileExtension!.toUpperCase(),
-                                style: const TextStyle(
-                                    fontSize: kFontSmall, color: kGrey3Color),
-                              ),
-                            ],
-                          )
+                          widget.subtitle ??
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  kHorizontalPaddingXSmall,
+                                  Text(
+                                    _fileSize!.toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize: kFontSmall,
+                                        color: widget.textColor ?? kGrey3Color),
+                                  ),
+                                  kHorizontalPaddingXSmall,
+                                  Text(
+                                    '·',
+                                    style: TextStyle(
+                                        fontSize: kFontSmall,
+                                        color: widget.textColor ?? kGrey3Color),
+                                  ),
+                                  kHorizontalPaddingXSmall,
+                                  Text(
+                                    _fileExtension!.toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize: kFontSmall,
+                                        color: widget.textColor ?? kGrey3Color),
+                                  ),
+                                ],
+                              )
                         ],
                       ),
                     ),
                     const SizedBox(width: 32),
                     widget.documentFile != null
                         ? LMIconButton(
-                            icon: const LMIcon(
-                                type: LMIconType.icon, icon: Icons.close),
+                            icon: widget.removeIcon ??
+                                const LMIcon(
+                                    type: LMIconType.icon, icon: Icons.close),
                             onTap: (actice) {
                               if (widget.onRemove != null) {
                                 widget.onRemove!();

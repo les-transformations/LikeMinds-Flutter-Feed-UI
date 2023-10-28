@@ -22,11 +22,21 @@ class LMCommentTile extends StatefulWidget {
     this.actionsPadding,
     required this.onMenuTap,
     required this.onTagTap,
+    this.backgroundColor,
+    this.contentBackgroundColor,
+    this.margin,
+    this.borderRadius,
+    this.width,
+    this.menu,
+    this.textStyle,
+    this.linkStyle,
   });
 
   final User user;
   final Reply comment;
 
+  final TextStyle? textStyle;
+  final TextStyle? linkStyle;
   final LMProfilePicture? profilePicture;
   final LMTextView? titleText;
   final LMTextView? subtitleText;
@@ -34,6 +44,12 @@ class LMCommentTile extends StatefulWidget {
   final EdgeInsets? actionsPadding;
   final Function(int) onMenuTap;
   final Function(String) onTagTap;
+  final Color? backgroundColor;
+  final Color? contentBackgroundColor;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final double? width;
+  final Widget? menu;
 
   @override
   State<LMCommentTile> createState() => _LMCommentTileState();
@@ -43,8 +59,14 @@ class _LMCommentTileState extends State<LMCommentTile> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+    ThemeData theme = Theme.of(context);
     return Container(
-      decoration: const BoxDecoration(color: kWhiteColor),
+      decoration: BoxDecoration(
+        color: widget.backgroundColor ?? kWhiteColor,
+        borderRadius: widget.borderRadius,
+      ),
+      margin: widget.margin,
+      width: widget.width,
       padding: const EdgeInsets.all(kPaddingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,14 +81,18 @@ class _LMCommentTileState extends State<LMCommentTile> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    widget.titleText ??
-                        LMTextView(
-                          text: widget.user.name,
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                    SizedBox(
+                      width: widget.width != null ? widget.width! * 0.6 : null,
+                      child: widget.titleText ??
+                          LMTextView(
+                            text: widget.user.name,
+                            textStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
                           ),
-                        ),
+                    ),
                     widget.subtitleText != null
                         ? kVerticalPaddingSmall
                         : const SizedBox(),
@@ -74,11 +100,12 @@ class _LMCommentTileState extends State<LMCommentTile> {
                   ],
                 ),
                 const Spacer(),
-                LMPostMenu(
-                  isFeed: false,
-                  menuItems: widget.comment.menuItems,
-                  onSelected: widget.onMenuTap,
-                ),
+                widget.menu ??
+                    LMPostMenu(
+                      isFeed: false,
+                      menuItems: widget.comment.menuItems,
+                      onSelected: widget.onMenuTap,
+                    ),
               ],
             ),
           ),
@@ -91,12 +118,18 @@ class _LMCommentTileState extends State<LMCommentTile> {
               expandText: "see more",
               animation: true,
               maxLines: 4,
-              linkStyle: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(color: kLinkColor),
+              hashtagStyle: widget.linkStyle ??
+                  Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: theme.colorScheme.primary),
+              linkStyle: widget.linkStyle ??
+                  Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: theme.colorScheme.primary),
               textAlign: TextAlign.left,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: widget.textStyle ?? Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           kVerticalPaddingSmall,
