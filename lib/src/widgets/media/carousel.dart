@@ -4,9 +4,11 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/media/image.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/media/video.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class LMCarousel extends StatefulWidget {
   final List<Attachment> attachments;
+  final Function(VideoController)? initialiseVideoController;
 
   final double? height;
   final double? width;
@@ -15,7 +17,7 @@ class LMCarousel extends StatefulWidget {
   final Color? borderColor;
   final Color? activeIndicatorColor;
   final Color? inactiveIndicatorColor;
-
+  final Color? backgroundColor;
   final Widget? activeIndicator;
   final Widget? inactiveIndicator;
 
@@ -23,6 +25,7 @@ class LMCarousel extends StatefulWidget {
   final LMVideo? videoItem;
   final Widget? errorWidget;
   final BoxFit? boxFit;
+  final Function(String, StackTrace)? onError;
 
   const LMCarousel({
     Key? key,
@@ -32,6 +35,7 @@ class LMCarousel extends StatefulWidget {
     this.borderRadius,
     this.borderSize,
     this.borderColor,
+    this.backgroundColor,
     this.activeIndicator,
     this.inactiveIndicator,
     this.imageItem,
@@ -40,6 +44,8 @@ class LMCarousel extends StatefulWidget {
     this.inactiveIndicatorColor,
     this.errorWidget,
     this.boxFit,
+    this.initialiseVideoController,
+    this.onError,
   }) : super(key: key);
 
   @override
@@ -64,8 +70,8 @@ class _LMCarouselState extends State<LMCarousel> {
     mediaWidgets = widget.attachments.map((e) {
       if (e.attachmentType == 1) {
         return Container(
-          color: Colors.black,
-          width: MediaQuery.of(context).size.width,
+          color: widget.backgroundColor ?? Colors.black,
+          width:widget.width?? MediaQuery.of(context).size.width,
           child: Center(
             child: widget.imageItem ??
                 LMImage(
@@ -76,23 +82,27 @@ class _LMCarouselState extends State<LMCarousel> {
                   borderColor: widget.borderColor,
                   boxFit: widget.boxFit ?? BoxFit.contain,
                   errorWidget: widget.errorWidget,
+                  onError: widget.onError,
                 ),
           ),
         );
       } else if ((e.attachmentType == 2)) {
         return Container(
-          color: Colors.black,
+          color: widget.backgroundColor ?? Colors.black,
           width: MediaQuery.of(context).size.width,
           child: widget.videoItem ??
-              LMVideo(
-                videoUrl: e.attachmentMeta.url,
-                width: widget.width,
-                height: widget.height,
-                borderRadius: widget.borderRadius,
-                borderColor: widget.borderColor,
-                boxFit: widget.boxFit ?? BoxFit.contain,
-                showControls: false,
-                errorWidget: widget.errorWidget,
+              Center(
+                child: LMVideo(
+                  initialiseVideoController: widget.initialiseVideoController,
+                  videoUrl: e.attachmentMeta.url,
+                  width: widget.width,
+                  height: widget.height,
+                  borderRadius: widget.borderRadius,
+                  borderColor: widget.borderColor,
+                  boxFit: widget.boxFit ?? BoxFit.contain,
+                  showControls: false,
+                  errorWidget: widget.errorWidget,
+                ),
               ),
         );
       } else {
@@ -121,10 +131,8 @@ class _LMCarouselState extends State<LMCarousel> {
               itemCount: mediaWidgets.length,
               itemBuilder: (context, index, _) => mediaWidgets[index],
               options: CarouselOptions(
-                initialPage: 0,
                 animateToClosest: false,
                 aspectRatio: 1,
-                scrollDirection: Axis.horizontal,
                 enableInfiniteScroll: false,
                 enlargeFactor: 0.0,
                 viewportFraction: 1.0,
@@ -176,7 +184,6 @@ class _LMCarouselState extends State<LMCarousel> {
                                           color:
                                               widget.inactiveIndicatorColor ??
                                                   kGrey1Color,
-                                          // color: Color.fromRGBO(0, 0, 0, 0.4),
                                         ),
                                       );
                             }).toList())

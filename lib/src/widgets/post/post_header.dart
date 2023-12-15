@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/utils.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/icon/icon.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/common/profile_picture.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/common/text/text_view.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/post/post.dart';
@@ -74,7 +73,7 @@ class LMPostHeader extends StatelessWidget {
                             onTap: onProfileTap,
                             fallbackTextStyle: fallbackTextStyle,
                           ),
-                      kHorizontalPaddingLarge,
+                      kHorizontalPaddingMedium,
                       Container(
                         constraints: BoxConstraints(
                           maxWidth: screenSize.width * 0.66,
@@ -82,11 +81,9 @@ class LMPostHeader extends StatelessWidget {
                         child: IntrinsicWidth(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Flexible(
                                     child: GestureDetector(
@@ -167,19 +164,19 @@ class LMPostHeader extends StatelessWidget {
                               ),
                               kVerticalPaddingSmall,
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Flexible(child: subText ?? const SizedBox()),
                                   subText != null
                                       ? kHorizontalPaddingXSmall
                                       : const SizedBox(),
-                                  LMTextView(
-                                    text: subText != null ? '·' : '',
-                                    textStyle: const TextStyle(
-                                      fontSize: kFontSmall,
-                                      color: kGrey3Color,
+                                  if (subText != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 1,left:1),
+                                      child: CircleAvatar(
+                                        radius: 2,
+                                        backgroundColor: kGrey3Color,
+                                      ),
                                     ),
-                                  ),
                                   subText != null
                                       ? kHorizontalPaddingXSmall
                                       : const SizedBox(),
